@@ -1,0 +1,43 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <dirent.h>
+
+void createDirectory(const char *path) {
+    if (mkdir(path, 0777) == -1) {
+        perror("Error creating directory");
+    }
+}
+
+void organizeFiles(const char *baseDir) {
+    DIR *dir;
+    struct dirent *entry;
+
+    if ((dir = opendir(baseDir)) == NULL) {
+        perror("Error opening directory");
+        return;
+    }
+
+    while ((entry = readdir(dir)) != NULL) {
+        if (entry->d_type == DT_REG) {
+            char *ext = strrchr(entry->d_name, '.');
+            if (ext) {
+                char dirName[256];
+                snprintf(dirName, sizeof(dirName), "%s/%s", baseDir, ext + 1);
+                createDirectory(dirName);
+                char oldPath[512], newPath[512];
+                snprintf(oldPath, sizeof(oldPath), "%s/%s", baseDir, entry->d_name);
+                snprintf(newPath, sizeof(newPath), "%s/%s/%s", baseDir, ext + 1, entry->d_name);
+                rename(oldPath, newPath);
+            }
+        }
+    }
+    closedir(dir);
+}
+
+int main() {
+    const char *baseDir = "files";
+    createDirectory(baseDir);
+    organizeFiles(baseDir);
+    return 0;
+}

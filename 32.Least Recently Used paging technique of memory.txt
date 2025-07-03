@@ -1,0 +1,66 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define FRAME_SIZE 3
+#define PAGE_SIZE 10
+
+int frames[FRAME_SIZE];
+int pages[PAGE_SIZE];
+int pageFaults = 0;
+
+void initializeFrames() {
+    for (int i = 0; i < FRAME_SIZE; i++) {
+        frames[i] = -1;
+    }
+}
+
+int findPage(int page) {
+    for (int i = 0; i < FRAME_SIZE; i++) {
+        if (frames[i] == page) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+int findLRU(int time[], int n) {
+    int minimum = time[0], pos = 0;
+    for (int i = 1; i < n; i++) {
+        if (time[i] < minimum) {
+            minimum = time[i];
+            pos = i;
+        }
+    }
+    return pos;
+}
+
+void LRU() {
+    int time[FRAME_SIZE] = {0};
+    initializeFrames();
+
+    for (int i = 0; i < PAGE_SIZE; i++) {
+        int page = pages[i];
+        int pageIndex = findPage(page);
+
+        if (pageIndex == -1) {
+            int lruIndex = findLRU(time, FRAME_SIZE);
+            frames[lruIndex] = page;
+            time[lruIndex] = i;
+            pageFaults++;
+        } else {
+            time[pageIndex] = i;
+        }
+    }
+}
+
+int main() {
+    // Sample page reference string
+    int samplePages[PAGE_SIZE] = {0, 1, 2, 0, 3, 0, 4, 2, 3, 0};
+    for (int i = 0; i < PAGE_SIZE; i++) {
+        pages[i] = samplePages[i];
+    }
+
+    LRU();
+    printf("Total Page Faults: %d\n", pageFaults);
+    return 0;
+}

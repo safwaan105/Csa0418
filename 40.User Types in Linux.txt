@@ -1,0 +1,28 @@
+Copy to BlackBox#include <stdio.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+
+int main() {
+    struct stat fileStat;
+
+    // Get file status
+    if(stat("example.txt", &fileStat) < 0)    
+        return 1;
+
+    // Print file permissions
+    printf("File Permissions:\n");
+    printf("User: %s\n", (fileStat.st_mode & S_IRUSR) ? "Read" : "No Read");
+    printf("User: %s\n", (fileStat.st_mode & S_IWUSR) ? "Write" : "No Write");
+    printf("User: %s\n", (fileStat.st_mode & S_IXUSR) ? "Execute" : "No Execute");
+
+    printf("Group: %s\n", (fileStat.st_mode & S_IRGRP) ? "Read" : "No Read");
+    printf("Group: %s\n", (fileStat.st_mode & S_IWGRP) ? "Write" : "No Write");
+    printf("Group: %s\n", (fileStat.st_mode & S_IXGRP) ? "Execute" : "No Execute");
+
+    printf("Others: %s\n", (fileStat.st_mode & S_IROTH) ? "Read" : "No Read");
+    printf("Others: %s\n", (fileStat.st_mode & S_IWOTH) ? "Write" : "No Write");
+    printf("Others: %s\n", (fileStat.st_mode & S_IXOTH) ? "Execute" : "No Execute");
+
+    return 0;
+}
